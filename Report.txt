@@ -1,0 +1,65 @@
+# Fraud Detection Report
+
+# 1. Data Cleaning: Handling Missing Values, Outliers, and Multicollinearity
+
+* No missing values were present in the dataset; hence, no imputation was needed.
+* Outliers were retained, especially in the amount column, as they might signal fraudulent behavior.
+* Multicollinearity was not addressed explicitly due to the robustness of tree-based models like LightGBM.
+
+# 2. Description of the Fraud Detection Model
+
+* Model used: LightGBM (Gradient Boosting framework).
+* Suitable for large, imbalanced datasets.
+* Key parameters:
+
+  * Objective: binary classification
+  * is_unbalance=True to handle class imbalance
+  * learning_rate=0.05
+  * num_leaves=31
+* The model was trained on 80% of the data and validated on the remaining 20%.
+
+# 3. Feature Selection Strategy
+
+* Dropped identifier columns: nameOrig, nameDest.
+* Categorical column type was label encoded.
+* Retained numerical features: amount, oldbalanceOrg, newbalanceOrig, oldbalanceDest, newbalanceDest.
+* Feature importance from LightGBM confirmed their contribution to prediction.
+
+# 4. Model Performance Evaluation
+
+* AUC Score: \~0.998, indicating excellent model discrimination.
+* High recall for the fraud class: captured most fraudulent transactions.
+* Evaluation tools: classification report, confusion matrix, ROC curve.
+* Balanced performance between precision and recall was achieved.
+
+# 5. Key Factors Predicting Fraud
+
+* High transaction amount.
+* Transaction type: TRANSFER and CASH_OUT were most common in frauds.
+* Zero or unchanged newbalanceOrig after a transaction.
+* Low or zero oldbalanceDest indicating unusual recipient behavior.
+* Irregular balance behavior in either sender or receiver accounts.
+
+# 6. Validity of These Indicators
+
+* These indicators align with real-world fraud behavior:
+
+  * Fraudsters typically initiate large TRANSFER or CASH_OUT operations.
+  * Suspicious if the sender’s balance doesn’t reduce or if the recipient has no prior balance.
+  * Dormant accounts with sudden activity raise red flags.
+
+# 7. Infrastructure-Level Recommendations
+
+* Implement real-time monitoring for suspicious transaction types.
+* Block or flag zero-balance accounts attempting large transfers.
+* Deploy behavioral profiling to track account usage patterns.
+* Introduce velocity checks for rapid transaction bursts.
+* Utilize graph analytics to uncover fraud rings or connected suspicious accounts.
+
+# 8. Post-Implementation Effectiveness Monitoring
+
+* Measure fraud rate reduction over time.
+* Conduct manual audits of flagged transactions.
+* Recalculate model precision, recall, and AUC periodically.
+* Use A/B testing to evaluate performance improvements.
+* Incorporate continuous feedback for model and rule updates.
